@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rupa - The Talented Singer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         /* CSS Variables for colors - Light mode (vibrant, girl-friendly) */
         :root {
@@ -317,6 +319,79 @@
                 right: -20px;
             }
         }
+
+        /* Like button styles */
+        .like-button {
+            background: var(--button-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .like-button:hover {
+            background: var(--button-hover);
+        }
+
+        .like-count {
+            margin-left: 5px;
+        }
+
+        /* Piano section styles */
+        #piano-section {
+            max-width: 80%;
+            margin: 50px auto;
+            text-align: center;
+            animation: fadeIn 2s ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        .piano {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .white-key {
+            width: 40px;
+            height: 150px;
+            background: #fff;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .black-key {
+            width: 25px;
+            height: 100px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 4px;
+            margin: 0 -12.5px;
+            z-index: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .white-key:hover, .black-key:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -353,24 +428,35 @@
             <div class="audio-item">
                 <audio id="audio1" controls><source src="audios/audio1.mp3" type="audio/mpeg"></audio>
                 <canvas id="visualizer1"></canvas>
+                <button class="like-button" data-audio="1">Like <span class="like-count" id="like-count-1">0</span></button>
             </div>
             <div class="audio-item">
                 <audio id="audio2" controls><source src="audios/audio2.mp3" type="audio/mpeg"></audio>
                 <canvas id="visualizer2"></canvas>
+                <button class="like-button" data-audio="2">Like <span class="like-count" id="like-count-2">0</span></button>
             </div>
             <div class="audio-item">
                 <audio id="audio3" controls><source src="audios/audio3.mp3" type="audio/mpeg"></audio>
                 <canvas id="visualizer3"></canvas>
+                <button class="like-button" data-audio="3">Like <span class="like-count" id="like-count-3">0</span></button>
             </div>
             <div class="audio-item">
                 <audio id="audio4" controls><source src="audios/audio4.mp3" type="audio/mpeg"></audio>
                 <canvas id="visualizer4"></canvas>
+                <button class="like-button" data-audio="4">Like <span class="like-count" id="like-count-4">0</span></button>
             </div>
             <div class="audio-item">
                 <audio id="audio5" controls><source src="audios/audio5.mp3" type="audio/mpeg"></audio>
                 <canvas id="visualizer5"></canvas>
+                <button class="like-button" data-audio="5">Like <span class="like-count" id="like-count-5">0</span></button>
             </div>
         </div>
+    </section>
+
+    <section id="piano-section">
+        <h2>Play Along Piano <span class="emoji-static">🎹</span></h2>
+        <p>Try playing some notes to accompany Rupa's singing!</p>
+        <div class="piano"></div>
     </section>
 
     <script>
@@ -407,7 +493,7 @@
         // Auto-slide every 5 seconds
         setInterval(() => changeSlide(1), 5000);
 
-        // Play All functionality
+        // Play All functionality with confetti
         const playAllButton = document.getElementById('play-all');
         const audios = document.querySelectorAll('audio');
         let currentAudioIndex = 0;
@@ -419,6 +505,12 @@
             });
             currentAudioIndex = 0;
             playNextAudio();
+            // Confetti explosion
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
         });
 
         function playNextAudio() {
@@ -489,7 +581,98 @@
             const scrollPosition = window.pageYOffset;
             parallax.style.transform = `translateZ(-1px) scale(1.1) translateY(${scrollPosition * 0.5}px)`;
         });
+
+        // Like buttons functionality
+        const likeButtons = document.querySelectorAll('.like-button');
+        likeButtons.forEach(button => {
+            const audioNum = button.dataset.audio;
+            const countSpan = document.getElementById(`like-count-${audioNum}`);
+            const storageKey = `like-audio${audioNum}`;
+            let likes = localStorage.getItem(storageKey) || 0;
+            countSpan.textContent = likes;
+
+            button.addEventListener('click', () => {
+                likes = parseInt(likes) + 1;
+                localStorage.setItem(storageKey, likes);
+                countSpan.textContent = likes;
+            });
+        });
+
+        // Piano functionality
+        let pianoSampler = null;
+
+        async function initPiano() {
+            if (pianoSampler) return;
+
+            pianoSampler = new Tone.Sampler({
+                urls: {
+                    C4: "C4.mp3",
+                    "D#4": "Ds4.mp3",
+                    "F#4": "Fs4.mp3",
+                    A4: "A4.mp3",
+                },
+                release: 1,
+                baseUrl: "https://tonejs.github.io/audio/salamander/",
+            }).toDestination();
+
+            await Tone.loaded();
+        }
+
+        function playPianoNote(note) {
+            if (!pianoSampler) return;
+            pianoSampler.triggerAttackRelease(note, "8n");
+        }
+
+        const keyMap = {
+            a: "C4",
+            w: "C#4",
+            s: "D4",
+            e: "D#4",
+            d: "E4",
+            f: "F4",
+            t: "F#4",
+            g: "G4",
+            y: "G#4",
+            h: "A4",
+            u: "A#4",
+            j: "B4",
+            k: "C5",
+        };
+
+        window.addEventListener("keydown", (e) => {
+            const note = keyMap[e.key.toLowerCase()];
+            if (note) playPianoNote(note);
+        });
+
+        // Create piano keys
+        const keys = [
+            { note: "C4", className: "white-key", label: "C" },
+            { note: "C#4", className: "black-key", label: "#" },
+            { note: "D4", className: "white-key", label: "D" },
+            { note: "D#4", className: "black-key", label: "#" },
+            { note: "E4", className: "white-key", label: "E" },
+            { note: "F4", className: "white-key", label: "F" },
+            { note: "F#4", className: "black-key", label: "#" },
+            { note: "G4", className: "white-key", label: "G" },
+            { note: "G#4", className: "black-key", label: "#" },
+            { note: "A4", className: "white-key", label: "A" },
+            { note: "A#4", className: "black-key", label: "#" },
+            { note: "B4", className: "white-key", label: "B" },
+            { note: "C5", className: "white-key", label: "C" },
+        ];
+
+        const pianoContainer = document.querySelector('.piano');
+        keys.forEach(k => {
+            const keyDiv = document.createElement('div');
+            keyDiv.className = k.className;
+            keyDiv.title = k.note;
+            keyDiv.textContent = k.label;
+            keyDiv.addEventListener('click', () => playPianoNote(k.note));
+            pianoContainer.appendChild(keyDiv);
+        });
+
+        // Init piano on load
+        initPiano();
     </script>
 </body>
 </html>
-
