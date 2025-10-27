@@ -16,6 +16,7 @@
             --audio-shadow: rgba(0, 0, 0, 0.3);
             --canvas-bg: rgba(255, 255, 255, 0.1);
             --particle-color: #ff69b4;
+            --glow-color: #ff69b4;
         }
 
         /* Dark mode overrides */
@@ -29,6 +30,7 @@
             --audio-shadow: rgba(255, 255, 255, 0.2);
             --canvas-bg: rgba(0, 0, 0, 0.5);
             --particle-color: #da70d6;
+            --glow-color: #da70d6;
         }
 
         body {
@@ -42,23 +44,38 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
+        /* Parallax background effect */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://source.unsplash.com/random/1920x1080/?music') no-repeat center center;
+            background-size: cover;
+            opacity: 0.1;
+            z-index: -2;
+            transform: translateZ(-1px) scale(1.1);
+        }
+
         header {
             text-align: center;
-            padding: 50px 20px;
+            padding: 40px 20px;
             background: var(--header-bg);
             box-shadow: 0 4px 20px var(--shadow-color);
             animation: fadeIn 2s ease-in-out;
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             text-shadow: 2px 2px 4px #4b0082;
             margin: 0;
-            /* Removed pulse animation for professional look */
         }
 
         p {
-            font-size: 1.2em;
+            font-size: 1.1em;
             margin: 10px 0;
         }
 
@@ -74,36 +91,12 @@
             border-radius: 20px;
             cursor: pointer;
             transition: background 0.3s, transform 0.3s;
-            animation: bounce 1.5s infinite;
+            z-index: 10;
         }
 
         #dark-toggle:hover {
             background: var(--button-hover);
             transform: scale(1.1);
-        }
-
-        /* Animated emojis with vibrant effects */
-        .emoji {
-            position: absolute;
-            font-size: 2em;
-            animation: floatUp 5s linear infinite, colorPulse 2s infinite alternate;
-            opacity: 0.9;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(720deg) scale(1.2); opacity: 0; }
-        }
-
-        @keyframes colorPulse {
-            0% { color: #ff69b4; }
-            100% { color: #da70d6; }
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
         }
 
         /* Particle effects */
@@ -141,6 +134,8 @@
             text-align: center;
             perspective: 1000px;
             animation: fadeIn 2s ease-in-out;
+            position: relative;
+            z-index: 1;
         }
 
         .carousel {
@@ -172,6 +167,11 @@
             border-radius: 10px;
             box-shadow: 0 5px 15px var(--shadow-color);
             backface-visibility: hidden;
+            transition: box-shadow 0.3s;
+        }
+
+        .carousel-item img:hover {
+            box-shadow: 0 10px 20px var(--glow-color);
         }
 
         .prev, .next {
@@ -185,6 +185,7 @@
             border-radius: 50%;
             cursor: pointer;
             transition: background 0.3s, transform 0.3s;
+            z-index: 2;
         }
 
         .prev { left: -50px; }
@@ -195,16 +196,19 @@
             transform: scale(1.2);
         }
 
-        /* Audio section with enhanced visualizer */
+        /* Audio section with enhanced visualizer and glow effect */
         #audios {
             max-width: 80%;
             margin: 50px auto;
             text-align: center;
             animation: fadeIn 2s ease-in-out 1s;
+            position: relative;
+            z-index: 1;
         }
 
         .audio-item {
             margin: 20px 0;
+            position: relative;
         }
 
         audio {
@@ -212,19 +216,47 @@
             max-width: 400px;
             border-radius: 10px;
             box-shadow: 0 5px 15px var(--audio-shadow);
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         audio:hover {
             transform: scale(1.05);
+            box-shadow: 0 10px 20px var(--glow-color);
         }
 
         canvas {
-            width: 400px;
+            width: 100%;
+            max-width: 400px;
             height: 100px;
             background: var(--canvas-bg);
             border-radius: 10px;
             margin-top: 10px;
+        }
+
+        /* Play All button */
+        #play-all {
+            background: var(--button-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            margin: 20px auto;
+            display: block;
+        }
+
+        #play-all:hover {
+            background: var(--button-hover);
+            transform: scale(1.1);
+        }
+
+        /* Emoji styling for static placement */
+        .emoji-static {
+            font-size: 1.5em;
+            margin: 0 5px;
+            display: inline-block;
+            vertical-align: middle;
         }
 
         /* Fade-in animation */
@@ -233,40 +265,76 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Media queries */
+        /* Media queries for responsive design */
         @media (max-width: 768px) {
-            canvas { width: 100%; }
-            .carousel { width: 250px; height: 250px; }
-            .prev { left: -30px; }
-            .next { right: -30px; }
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .carousel {
+                width: 250px;
+                height: 250px;
+            }
+            .prev {
+                left: -30px;
+            }
+            .next {
+                right: -30px;
+            }
+            canvas {
+                max-width: 100%;
+            }
+            audio {
+                max-width: 100%;
+            }
+            .emoji-static {
+                font-size: 1.2em;
+            }
+            #dark-toggle {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            #play-all {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .carousel {
+                width: 200px;
+                height: 200px;
+            }
+            .prev {
+                left: -20px;
+            }
+            .next {
+                right: -20px;
+            }
         }
     </style>
 </head>
 <body>
-    <button id="dark-toggle">🌙</button>
+    <button id="dark-toggle">Toggle Dark Mode 🌙</button>
+
+    <!-- Parallax background -->
+    <div class="parallax-bg"></div>
 
     <!-- Particle container -->
     <div id="particles"></div>
 
     <header>
-        <h1>Rupa - The Talented Singer</h1>
-        <p>Rupa is an exceptional singer whose voice captivates all who hear it. 🌟</p>
+        <h1>Rupa - The Talented Singer <span class="emoji-static">🎤</span></h1>
+        <p>Rupa is a remarkable friend and an exceptional singer whose voice captivates all who hear it. <span class="emoji-static">🌟</span></p>
     </header>
 
-    <!-- Animated emojis -->
-    <div class="emoji" style="left: 5%; animation-delay: 0s;">🎶</div>
-    <div class="emoji" style="left: 15%; animation-delay: 0.5s;">💖</div>
-    <div class="emoji" style="left: 25%; animation-delay: 1s;">🎤</div>
-    <div class="emoji" style="left: 35%; animation-delay: 1.5s;">🌟</div>
-    <div class="emoji" style="left: 45%; animation-delay: 2s;">🎵</div>
-    <div class="emoji" style="left: 55%; animation-delay: 2.5s;">💕</div>
-    <div class="emoji" style="left: 65%; animation-delay: 3s;">🎼</div>
-    <div class="emoji" style="left: 75%; animation-delay: 3.5s;">✨</div>
-    <div class="emoji" style="left: 85%; animation-delay: 4s;">🎶</div>
-    <div class="emoji" style="left: 95%; animation-delay: 4.5s;">💖</div>
-
     <section id="gallery">
-        <h2>Photo Gallery 📸✨</h2>
+        <h2>Photo Gallery <span class="emoji-static">📸</span></h2>
         <div class="carousel">
             <div class="carousel-item active"><img src="images/photo1.jpg" alt="Rupa Photo 1"></div>
             <div class="carousel-item"><img src="images/photo2.jpg" alt="Rupa Photo 2"></div>
@@ -279,7 +347,8 @@
     </section>
 
     <section id="audios">
-        <h2>Voice Records 🎙️💜</h2>
+        <h2>Voice Records <span class="emoji-static">🎙️</span></h2>
+        <button id="play-all">Play All <span class="emoji-static">▶️</span></button>
         <div class="audio-list">
             <div class="audio-item">
                 <audio id="audio1" controls><source src="audios/audio1.mp3" type="audio/mpeg"></audio>
@@ -309,7 +378,7 @@
         const toggleButton = document.getElementById('dark-toggle');
         toggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark');
-            toggleButton.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+            toggleButton.textContent = document.body.classList.contains('dark') ? 'Toggle Light Mode ☀️' : 'Toggle Dark Mode 🌙';
         });
 
         // Generate particles
@@ -337,6 +406,36 @@
 
         // Auto-slide every 5 seconds
         setInterval(() => changeSlide(1), 5000);
+
+        // Play All functionality
+        const playAllButton = document.getElementById('play-all');
+        const audios = document.querySelectorAll('audio');
+        let currentAudioIndex = 0;
+
+        playAllButton.addEventListener('click', () => {
+            audios.forEach((audio, index) => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+            currentAudioIndex = 0;
+            playNextAudio();
+        });
+
+        function playNextAudio() {
+            if (currentAudioIndex < audios.length) {
+                const audio = audios[currentAudioIndex];
+                audio.play().then(() => {
+                    audio.onended = () => {
+                        currentAudioIndex++;
+                        playNextAudio();
+                    };
+                }).catch((error) => {
+                    console.error('Audio play error:', error);
+                    currentAudioIndex++;
+                    playNextAudio();
+                });
+            }
+        }
 
         // Audio Visualizers with enhanced colors
         const audioElements = ['audio1', 'audio2', 'audio3', 'audio4', 'audio5'];
@@ -383,9 +482,13 @@
                 draw();
             });
         });
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const parallax = document.querySelector('.parallax-bg');
+            const scrollPosition = window.pageYOffset;
+            parallax.style.transform = `translateZ(-1px) scale(1.1) translateY(${scrollPosition * 0.5}px)`;
+        });
     </script>
 </body>
 </html>
-
-
-
